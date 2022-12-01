@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "607045008876",
+    "project_id": "readingclub-28bef",
+    "storage_bucket": "readingclub-28bef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607045008876:android:9500d9942ab23e7acd54c9",
+        "android_client_info": {
+          "package_name": "com.example.reading_club"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607045008876-lm7d8h4hkbpl7ih179mcl6filrashlsk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDw0r6BMoNXuzMWfSb3wNWdD847dmgrOyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607045008876-lm7d8h4hkbpl7ih179mcl6filrashlsk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "607045008876-pk45eet1uau658l2r41vit4ardgdkdom.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.readingClub"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

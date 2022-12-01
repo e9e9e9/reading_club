@@ -1,6 +1,21 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-void main() {
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'firebase_options.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
@@ -49,67 +64,240 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  late DatabaseReference _counterRef;
+  late DatabaseReference _messagesRef;
+  late StreamSubscription<DatabaseEvent> _counterSubscription;
+  late StreamSubscription<DatabaseEvent> _messagesSubscription;
+  bool _anchorToBottom = false;
 
-  void _incrementCounter() {
+  String _kTestKey = 'Hello';
+  String _kTestValue = 'world!';
+  FirebaseException? _error;
+  bool initialized = false;
+  final databaseReference = FirebaseDatabase.instance.ref();
+
+  late CollectionReference _usersRef;
+  late StreamSubscription<DatabaseEvent> _usersSubscription;
+  List<dynamic> _users = [];
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  Future<void> init() async {
+    _counterRef = FirebaseDatabase.instance.ref('counter');
+    _usersRef = FirebaseFirestore.instance.collection('users');
+    final database = FirebaseDatabase.instance;
+
+    _messagesRef = database.ref('messages');
+
+    database.setLoggingEnabled(false);
+
+    if (!kIsWeb) {
+      database.setPersistenceEnabled(true);
+      database.setPersistenceCacheSizeBytes(10000000);
+    }
+
+    if (!kIsWeb) {
+      await _counterRef.keepSynced(true);
+    }
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      initialized = true;
+    });
+
+    try {
+      final counterSnapshot = await _counterRef.get();
+      final usersSnapshot = FirebaseFirestore.instance
+          .collection('users')
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map(
+                (e) => e.data(),
+              )
+              .toList());
+
+      print('Connected to directly configured database and read '
+          '${counterSnapshot.value}'
+          '${FirebaseFirestore.instance.collection('users')}'
+          // '${usersSnapshot.value}',
+          );
+    } catch (err) {
+      print(err);
+    }
+    FirebaseFirestore.instance.collection('users').snapshots().listen((event) {
+      print(event.docs.first.data());
+    });
+    _counterSubscription = _counterRef.onValue.listen(
+      (DatabaseEvent event) {
+        setState(() {
+          _error = null;
+          _counter = (event.snapshot.value ?? 0) as int;
+        });
+      },
+      onError: (Object o) {
+        final error = o as FirebaseException;
+        setState(() {
+          _error = error;
+        });
+      },
+    );
+
+    // _usersSubscription = _usersRef.onValue.listen(
+    //   (DatabaseEvent event) {
+    //     setState(() {
+    //       _error = null;
+    //       _users = (event.snapshot.value ??
+    //           [
+    //             {'name': 'default'}
+    //           ]) as List<dynamic>;
+    //     });
+    //   },
+    //   onError: (Object o) {
+    //     final error = o as FirebaseException;
+    //     setState(() {
+    //       _error = error;
+    //     });
+    //   },
+    // );
+
+    final messagesQuery = _messagesRef.limitToLast(10);
+
+    _messagesSubscription = messagesQuery.onChildAdded.listen(
+      (DatabaseEvent event) {
+        print('Child added: ${event.snapshot.value}');
+      },
+      onError: (Object o) {
+        final error = o as FirebaseException;
+        print('Error: ${error.code} ${error.message}');
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _messagesSubscription.cancel();
+    _counterSubscription.cancel();
+  }
+
+  Future<void> _increment() async {
+    print('_increment pressed');
+    // await _counterRef.set(ServerValue.increment(1));
+    print('increment');
+    final docUser = FirebaseFirestore.instance
+        .collection('users')
+        .doc('5FgugKcFy0FmmZQ99U8T');
+    final json = {'age': 10};
+
+    print('update');
+    docUser
+        .update(json)
+        .then((value) => print('success'))
+        .onError((error, stackTrace) {
+      print('error is occured');
+      print(error);
+    });
+
+    await _messagesRef
+        .push()
+        .set(<String, String>{_kTestKey: '$_kTestValue $_counter'});
+  }
+
+  Future<void> _incrementAsTransaction() async {
+    // try {
+    //   final transactionResult = await _counterRef.runTransaction((mutableData) {
+    //     return Transaction.success((mutableData as int? ?? 0) + 1);
+    //   });
+
+    //   if (transactionResult.committed) {
+    //     final newMessageRef = _messagesRef.push();
+    //     await newMessageRef.set(<String, String>{
+    //       _kTestKey: '$_kTestValue ${transactionResult.snapshot.value}'
+    //     });
+    //   }
+    // } on FirebaseException catch (e) {
+    //   print(e.message);
+    // }
+  }
+
+  Future<void> _deleteMessage(DataSnapshot snapshot) async {
+    final messageRef = _messagesRef.child(snapshot.key!);
+    await messageRef.remove();
+  }
+
+  void _setAnchorToBottom(bool? value) {
+    if (value == null) {
+      return;
+    }
+
+    setState(() {
+      _anchorToBottom = value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    if (!initialized) return Container();
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Flutter Database Example'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        children: [
+          Flexible(
+            child: Center(
+              child: _error == null
+                  ? Text(
+                      'Button tapped $_counter time${_counter == 1 ? '' : 's'}.\n\n'
+                      'user name is ${_users.isNotEmpty ? _users[0]["name"] : 'unknown'}.\n\n'
+                      'This includes all devices, ever.',
+                    )
+                  : Text(
+                      'Error retrieving button tap count:\n${_error!.message}',
+                    ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+          ),
+          ElevatedButton(
+            onPressed: _incrementAsTransaction,
+            child: const Text('Increment as transaction'),
+          ),
+          ListTile(
+            leading: Checkbox(
+              onChanged: _setAnchorToBottom,
+              value: _anchorToBottom,
             ),
-          ],
-        ),
+            title: const Text('Anchor to bottom'),
+          ),
+          Flexible(
+            child: FirebaseAnimatedList(
+              key: ValueKey<bool>(_anchorToBottom),
+              query: _messagesRef,
+              reverse: _anchorToBottom,
+              itemBuilder: (context, snapshot, animation, index) {
+                return SizeTransition(
+                  sizeFactor: animation,
+                  child: ListTile(
+                    trailing: IconButton(
+                      onPressed: () => _deleteMessage(snapshot),
+                      icon: const Icon(Icons.delete),
+                    ),
+                    title: Text('$index: ${snapshot.value.toString()}'),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _increment,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
