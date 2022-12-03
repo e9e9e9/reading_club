@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:reading_club/Screens/Welcome/welcome_screen.dart';
+import 'package:reading_club/main_backup.dart';
 import 'package:reading_club/responsive.dart';
 
 import '../../components/background.dart';
@@ -45,21 +48,46 @@ class MobileLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const LoginScreenTopImage(),
-        Row(
-          children: const [
-            Spacer(),
-            Expanded(
-              flex: 8,
-              child: LoginForm(),
-            ),
-            Spacer(),
-          ],
-        ),
-      ],
+    // return Column(
+    //   mainAxisAlignment: MainAxisAlignment.center,
+    //   children: <Widget>[
+    //     const LoginScreenTopImage(),
+    //     Row(
+    //       children: const [
+    //         Spacer(),
+    //         Expanded(
+    //           flex: 8,
+    //           child: LoginForm(),
+    //         ),
+    //         Spacer(),
+    //       ],
+    //     ),
+    //   ],
+    // );
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData) {
+          return WelcomeScreen();
+        } else {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const LoginScreenTopImage(),
+              Row(
+                children: const [
+                  Spacer(),
+                  Expanded(
+                    flex: 8,
+                    child: LoginForm(),
+                  ),
+                  Spacer(),
+                ],
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 }
