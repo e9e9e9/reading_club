@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:reading_club/Screens/MainPage/main_page.dart';
 import 'package:reading_club/Screens/Welcome/welcome_screen.dart';
 import 'package:reading_club/main_backup.dart';
 import 'package:reading_club/responsive.dart';
@@ -68,7 +69,17 @@ class MobileLoginScreen extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData) {
-          return WelcomeScreen();
+          print(snapshot.data);
+          Future.delayed(
+              const Duration(microseconds: 500),
+              () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => MainPage()),
+                    (Route<dynamic> route) => false,
+                  ));
+
+          return Column();
+          // return MainPage();
         } else {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
