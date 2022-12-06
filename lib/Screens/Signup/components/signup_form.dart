@@ -54,6 +54,16 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
           ),
           const SizedBox(height: defaultPadding / 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "비밀번호는 6자 이상 입력해 주세요.",
+                style: const TextStyle(color: kPrimaryColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: defaultPadding),
           ElevatedButton(
             onPressed: () async {
               try {

@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:reading_club/Screens/Profile/profile.dart';
 import 'package:reading_club/components/bottom_naviagation.dart';
 
 class MainPage extends StatefulWidget {
@@ -9,13 +11,39 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  int index = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNaviagation(index: 0),
-      body: Column(
-        children: [Text('main page')],
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: Colors.purple[100],
       ),
+      bottomNavigationBar:
+          BottomNaviagation(index: index, callback: setIndexState),
+      body: getContent(index),
     );
+  }
+
+  getContent(int index) {
+    print(FirebaseAuth.instance.currentUser?.email);
+
+    switch (index) {
+      case 0:
+        return Column(children: [Text('main page')]);
+      case 1:
+        break;
+      case 2:
+        return Profile();
+      default:
+        break;
+    }
+  }
+
+  setIndexState(int indexParam) {
+    setState(() {
+      index = indexParam;
+    });
   }
 }

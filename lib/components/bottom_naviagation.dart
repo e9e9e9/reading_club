@@ -5,17 +5,18 @@ import '../Screens/MainPage/main_page.dart';
 
 class BottomNaviagation extends StatelessWidget {
   final int index;
-  final onPressed;
+  final callback;
 
   const BottomNaviagation({
     Key? key,
     required this.index,
-    this.onPressed,
+    required this.callback,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+        backgroundColor: Colors.purple[100],
         type: BottomNavigationBarType.fixed,
         currentIndex: index,
         showSelectedLabels: true,
@@ -54,35 +55,7 @@ class BottomNaviagation extends StatelessWidget {
           ),
         ],
         onTap: (int index) {
-          switch (index) {
-            case 0:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-            case 1:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-            case 2:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => Profile()),
-                (Route<dynamic> route) => false,
-              );
-              break;
-            default:
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-                (Route<dynamic> route) => false,
-              );
-          }
+          callback(index);
         });
   }
 }
