@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:reading_club/Screens/Profile/profile.dart';
+
+import '../Screens/MainPage/main_page.dart';
 
 class BottomNaviagation extends StatelessWidget {
   final int index;
@@ -69,7 +72,7 @@ class BottomNaviagation extends StatelessWidget {
             case 2:
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => MainPage()),
+                MaterialPageRoute(builder: (context) => Profile()),
                 (Route<dynamic> route) => false,
               );
               break;
