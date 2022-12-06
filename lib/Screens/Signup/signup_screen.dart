@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reading_club/constants.dart';
 import 'package:reading_club/responsive.dart';
 import '../../components/background.dart';
+import '../MainPage/main_page.dart';
 import 'components/sign_up_top_image.dart';
 import 'components/signup_form.dart';
 import 'components/socal_sign_up.dart';
@@ -48,22 +50,40 @@ class MobileSignupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const SignUpScreenTopImage(),
-        Row(
-          children: const [
-            Spacer(),
-            Expanded(
-              flex: 8,
-              child: SignUpForm(),
-            ),
-            Spacer(),
-          ],
-        ),
-        // const SocalSignUp()
-      ],
-    );
+    return StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            Future.delayed(
+                const Duration(microseconds: 500),
+                () => Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => MainPage()),
+                      (Route<dynamic> route) => false,
+                    ));
+
+            return Column();
+            // return MainPage();
+          } else {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const SignUpScreenTopImage(),
+                Row(
+                  children: const [
+                    Spacer(),
+                    Expanded(
+                      flex: 8,
+                      child: SignUpForm(),
+                    ),
+                    Spacer(),
+                  ],
+                ),
+                // const SocalSignUp()
+              ],
+            );
+          }
+        });
   }
 }
