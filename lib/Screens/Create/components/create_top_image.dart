@@ -13,7 +13,7 @@ class CreateScreenTopImage extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "회원가입".toUpperCase(),
+          "모입 생성".toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: defaultPadding),

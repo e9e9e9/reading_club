@@ -54,6 +54,7 @@ class Club {
           .toString()
           .replaceAll('[', '')
           .replaceAll(']', '')
+          .replaceAll(' ', '')
           .split(',')
           .map((e) => User(email: e))),
     );

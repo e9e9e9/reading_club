@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:reading_club/Model/club.dart';
 import 'package:reading_club/Model/user.dart' as AppUser;
+import 'package:reading_club/Model/user.dart';
 import 'package:reading_club/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:reading_club/globals.dart';
@@ -48,7 +49,7 @@ class _ClubsState extends State<Clubs> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      color: Colors.purple[50],
+                      color: kPrimaryLightColor,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(children: [
@@ -163,17 +164,41 @@ class _ClubsState extends State<Clubs> {
   }
 
   getAttandButton(Club club) {
+    print('currentUser?.email : ${currentUser?.email}');
+    print('club.members : ${club.members}');
+
+    bool isMember = false;
+
+    for (User member in club.members) {
+      if (member.email == currentUser?.email) {
+        isMember = true;
+        break;
+      }
+    }
+
     if (club.owner == currentUser?.email) {
       return ElevatedButton(
-        onPressed: () {},
+        onPressed: () async {
+          final docRef =
+              FirebaseFirestore.instance.collection('clubs').doc(club.id);
+
+          await docRef.delete();
+        },
         child: Text('모임 삭제'),
         style: ButtonStyle(
             backgroundColor: MaterialStatePropertyAll<Color>(Colors.red)),
       );
     }
-    if (club.members.contains(currentUser?.email)) {
+    if (isMember) {
       return ElevatedButton(
-        onPressed: () {},
+        onPressed: () async {
+          final docRef =
+              FirebaseFirestore.instance.collection('clubs').doc(club.id);
+
+          await docRef.update({
+            'members': FieldValue.arrayRemove([currentUser?.email])
+          });
+        },
         child: Text('참석 취소'),
         style: ButtonStyle(
             backgroundColor: MaterialStatePropertyAll<Color>(Colors.red)),
@@ -181,23 +206,17 @@ class _ClubsState extends State<Clubs> {
     } else {
       return ElevatedButton(
           onPressed: () async {
-            var updatedJson;
             Club? updatedClub;
             final docRef =
                 FirebaseFirestore.instance.collection('clubs').doc(club.id);
-            DocumentSnapshot doc = await docRef.get();
-
-            updatedClub = Club.fromJson(doc.data() as Map<String, dynamic>);
-            updatedClub.members.add(AppUser.User(email: currentUser!.email));
-            updatedJson = updatedClub.toJson();
-
-            print('updatedJson: $updatedJson');
 
             await docRef.update({
               'members': FieldValue.arrayUnion([currentUser?.email])
             });
-            setState(() {});
+            // setState(() {});
           },
+          style: ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll<Color>(kPrimaryColor)),
           child: Text('참석'));
     }
   }
