@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:reading_club/Screens/Clubs/clubs.dart';
+import 'package:reading_club/Screens/Create/create_screen.dart';
 import 'package:reading_club/Screens/Profile/profile.dart';
 import 'package:reading_club/components/bottom_naviagation.dart';
+import 'package:reading_club/globals.dart';
+import 'package:reading_club/Model/user.dart' as AppUser;
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -12,6 +16,16 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int index = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (FirebaseAuth.instance.currentUser != null) {
+      currentUser = AppUser.User(
+          email: FirebaseAuth.instance.currentUser!.email.toString());
+    } else {
+      currentUser = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +45,9 @@ class _MainPageState extends State<MainPage> {
 
     switch (index) {
       case 0:
-        return Column(children: [Text('main page')]);
+        return Clubs();
       case 1:
-        break;
+        return CreateScreen();
       case 2:
         return Profile();
       default:
