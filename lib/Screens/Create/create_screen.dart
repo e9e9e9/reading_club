@@ -22,7 +22,9 @@ class CreateScreen extends StatelessWidget {
             Spacer(),
             Expanded(
               flex: 8,
-              child: CreateForm(),
+              child: CreateForm(
+                restorationId: 'create_screen',
+              ),
             ),
             Spacer(),
           ],

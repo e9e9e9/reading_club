@@ -84,7 +84,7 @@ class MobileLoginScreen extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const LoginScreenTopImage(),
+              // const LoginScreenTopImage(),
               Row(
                 children: const [
                   Spacer(),

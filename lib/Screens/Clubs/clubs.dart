@@ -7,6 +7,7 @@ import 'package:reading_club/Model/user.dart';
 import 'package:reading_club/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:reading_club/globals.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Clubs extends StatefulWidget {
   const Clubs({Key? key}) : super(key: key);
@@ -31,7 +32,13 @@ class _ClubsState extends State<Clubs> {
           }).toList();
           return getClubList(clubs);
         } else {
-          return Text('데이터를 로드하지 못했습니다.');
+          return Center(
+            child: LoadingAnimationWidget.twistingDots(
+              leftDotColor: Color.fromRGBO(38, 166, 154, 1),
+              rightDotColor: Color.fromRGBO(121, 134, 203, 1),
+              size: 70,
+            ),
+          );
         }
       },
     );
@@ -43,11 +50,11 @@ class _ClubsState extends State<Clubs> {
     return Column(
       children: [
         Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
                   Club club = clubs[index];
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(4.0),
                     child: Card(
                       color: kPrimaryLightColor,
                       child: Padding(
@@ -85,7 +92,9 @@ class _ClubsState extends State<Clubs> {
                                       flex: 1,
                                       child: Text(
                                         '모임장',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -156,8 +165,8 @@ class _ClubsState extends State<Clubs> {
                     ),
                   );
                 },
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(),
+                // separatorBuilder: (BuildContext context, int index) =>
+                //     const Divider(),
                 itemCount: clubs.length))
       ],
     );
@@ -206,7 +215,6 @@ class _ClubsState extends State<Clubs> {
     } else {
       return ElevatedButton(
           onPressed: () async {
-            Club? updatedClub;
             final docRef =
                 FirebaseFirestore.instance.collection('clubs').doc(club.id);
 

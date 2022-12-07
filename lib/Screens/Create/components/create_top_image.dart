@@ -17,17 +17,6 @@ class CreateScreenTopImage extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: defaultPadding),
-        Row(
-          children: [
-            const Spacer(),
-            Expanded(
-              flex: 8,
-              child: SvgPicture.asset("assets/icons/Create.svg"),
-            ),
-            const Spacer(),
-          ],
-        ),
-        SizedBox(height: defaultPadding),
       ],
     );
   }
