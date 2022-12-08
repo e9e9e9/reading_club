@@ -53,6 +53,7 @@ class _ClubsState extends State<Clubs> {
             child: ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
                   Club club = clubs[index];
+                  print('${club.clubName} : ${club.members.length}');
                   return Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Card(
