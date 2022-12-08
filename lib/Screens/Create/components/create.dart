@@ -165,18 +165,6 @@ class _CreateFormState extends State<CreateForm> with RestorationMixin {
               onTap: isDateSelected
                   ? () => DatePicker.showTimePicker(context,
                           showTitleActions: true,
-                          // minTime: DateTime(
-                          //     _selectedDate.value.year,
-                          //     _selectedDate.value.month,
-                          //     _selectedDate.value.day,
-                          //     0,
-                          //     0),
-                          // maxTime: DateTime(
-                          //     _selectedDate.value.year,
-                          //     _selectedDate.value.month,
-                          //     _selectedDate.value.day,
-                          //     23,
-                          //     0),
                           showSecondsColumn: false, onChanged: (date) {
                         print('change $date');
                       }, onConfirm: (date) {
@@ -281,6 +269,7 @@ class _CreateFormState extends State<CreateForm> with RestorationMixin {
             nameController.text = '';
             descController.text = '';
             locController.text = '';
+            isDateSelected = false;
             confirmedDate = null;
             setState(() {});
 

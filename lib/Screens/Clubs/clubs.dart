@@ -17,7 +17,7 @@ class Clubs extends StatefulWidget {
 }
 
 class _ClubsState extends State<Clubs> {
-  List<dynamic> clubs = [];
+  List<Club> clubs = [];
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +26,11 @@ class _ClubsState extends State<Clubs> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         print('snapshot updated');
         if (snapshot.hasData) {
-          clubs = snapshot.data.docs.map((doc) {
+          clubs = List<Club>.from(snapshot.data.docs.map((doc) {
             print(doc.data());
             return Club.fromJson(doc.data());
-          }).toList();
+          }).toList());
+          clubs.sort((a, b) => a.time.compareTo(b.time));
           return getClubList(clubs);
         } else {
           return Center(
@@ -44,7 +45,7 @@ class _ClubsState extends State<Clubs> {
     );
   }
 
-  getClubList(List<dynamic> clubs) {
+  getClubList(List<Club> clubs) {
     final f = DateFormat('yyyy-MM-dd hh:mm');
 
     return Column(
