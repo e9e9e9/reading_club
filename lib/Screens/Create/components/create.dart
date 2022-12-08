@@ -270,7 +270,7 @@ class _CreateFormState extends State<CreateForm> with RestorationMixin {
             'clubName': nameController.text.trim(),
             'desc': descController.text.trim(),
             'loc': locController.text.trim(),
-            'member': FieldValue.arrayUnion([currentUser?.email]),
+            'members': FieldValue.arrayUnion([currentUser?.email]),
             'owner': currentUser?.email,
             'time': confirmedDate
           };
